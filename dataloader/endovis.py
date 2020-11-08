@@ -49,11 +49,12 @@ def endovis_simple_loader(file_names, shuffle=False, transform=None, problem_typ
 
 
 def endovis_few_shot_loader(train_file_names, val_file_names, problem_type, n_ways, n_shots, n_queries, batch_size):
-    train_loader = endovis_simple_loader(train_file_names, shuffle=True, transform=None,
-                                         problem_type=problem_type,
-                                         batch_size=batch_size)
-    val_loader = endovis_simple_loader(val_file_names, transform=None, problem_type=problem_type,
-                                       batch_size=batch_size)
+    support_loader = endovis_simple_loader(train_file_names, shuffle=True, transform=None,
+                                           problem_type=problem_type,
+                                           batch_size=n_shots)
+    query_loader = endovis_simple_loader(val_file_names, transform=None, problem_type=problem_type,
+                                         batch_size=n_queries)
+    # TODO handle the batch size in few shot
     print('ok')
 
 

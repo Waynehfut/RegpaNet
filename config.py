@@ -46,7 +46,7 @@ def cfg():
             'align': True
         }
         task = {
-            'n_ways': 1,
+            'n_ways': 1,  # For EndoVis can be 1,2,3 with corresponding task (binary, parts and instruments)
             'n_shots': 1,
             'n_queries': 1,
         }
