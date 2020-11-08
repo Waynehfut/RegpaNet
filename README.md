@@ -15,9 +15,11 @@ You can obtain the dataset by following the instructions in this [synapse](https
 
 ## Model
 
-Architecture is shown as follow. Details will be updated once the paper is accepted. Basically, our model is based on the prototype network by Jake Snell [1]. We extract support set features with the model backbone resnet-50 then obtain the prototype from the ground truth, the feature map will inject to the group as a group assignment. The assigned feature will further get the segmentation from the Query set, and it will generate a query region group. The New generated group will gain the predicted result based on the feature map extracted from the support set.
+Architecture is shown as follow. Details will be updated once the paper is accepted. Basically, our model is based on the prototype network by Jake Snell [1]. We extract support set features with the model backbone resnet-50 then obtain the prototype from the ground truth, the feature map will inject to the group as a group assignment. The assigned feature will further get the segmentation from the Query set, and it will generate a query region group. The New generated group will gain the predicted result based on the feature map extracted from the support set. Some code are referred from the [PANet](https://github.com/kaixin96/PANet) 
 
 ![Model](https://i.loli.net/2020/10/25/oGcgtJVdiS8OPLI.png)
 
+## Reference
+[1] J. Snell, K. Swersky, and R. Zemel, "Prototypical Networks for Few-shot Learning," in Advances in Neural Information Processing Systems 30, I. Guyon, U. V. Luxburg, S. Bengio, H. Wallach, R. Fergus, S. Vishwanathan, and R. Garnett, Eds. Curran Associates, Inc., 2017, pp. 4077-4087.
 
-[1] J. Snell, K. Swersky, and R. Zemel, “Prototypical Networks for Few-shot Learning,” in Advances in Neural Information Processing Systems 30, I. Guyon, U. V. Luxburg, S. Bengio, H. Wallach, R. Fergus, S. Vishwanathan, and R. Garnett, Eds. Curran Associates, Inc., 2017, pp. 4077–4087.
+[2] WANG, K. "Kaixin96/PANet", 2019, https://github.com/kaixin96/PANet 

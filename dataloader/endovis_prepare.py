@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 -------------------------------------------------
-   File Name：       endovis_predata.py
+   File Name：       endovis_prepare.py
    Description :     Dataloader for the EndoVis
    Author :          HAO
    Create by :       PyCharm
