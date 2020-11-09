@@ -58,4 +58,6 @@ def main(_run, _config, _log):
     _log.info('### Start training ###')
     i_iter = 0
     log_loss = {'loss': 0, 'align_loss': 0}
+    for i_iter,sampled_batch in enumerate(few_shot_loader):
+        print(i_iter)
 

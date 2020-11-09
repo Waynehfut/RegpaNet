@@ -19,7 +19,7 @@ from .endovis_prepare import binary_factor, parts_factor, instrument_factor
 from albumentations.pytorch.functional import img_to_tensor
 
 
-class EndovisDataset(Dataset):
+class EndoVisDataset(Dataset):
     def __init__(self, file_names, to_augment=False, transform=None, mode='train',
                  problem_types=None):
         if problem_types is None:
@@ -114,9 +114,8 @@ def endo_fewshot_loader(file_names, shuffle=False, transform=None, problem_types
                         batch_size=2, num_workers=1):
     if problem_types is None:
         problem_types = ['binary', 'parts', 'instruments']
-    endo_dataset = EndovisDataset(file_names=file_names, transform=transform, problem_types=problem_types)
-    fewshot_dataset = CommFewShotDataset(dataset=endo_dataset, n_ways=n_ways, n_shots=n_shots, n_queries=n_queries)
-    #TODO handle the NoneType error
+    endo_dataset = EndoVisDataset(file_names=file_names, transform=transform, problem_types=problem_types)
+    fewshot_dataset = CommFewShotDataset(datasets=endo_dataset, n_ways=n_ways, n_shots=n_shots, n_queries=n_queries)
     fewshot_loader = DataLoader(
         dataset=fewshot_dataset,
         shuffle=shuffle,
