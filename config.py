@@ -34,19 +34,27 @@ def cfg():
     mode = 'train'  # or 'test'
     problem_type = 'binary'  # or 'parts', 'instruments'
     split = 0  # or 1,2,3
+    cuda_visible = '0'
+    gpu_id = 5  #
     if mode == 'train':
         dataset = 'EndoVis'  # or 'ROBUST'
         n_steps = 30000
         label_sets = 0
         batch_size = 1
         lr_milestones = [10000, 20000, 30000]
+        align_loss_scalar = 1
+        ignore_label = 255  # ignore black pixel
         print_interval = 100
         save_pred_every = 10000
+        train_crop_height = 1024
+        train_crop_width = 1280
+        val_crop_height = 1024
+        val_crop_width = 1280
         model = {
             'align': True
         }
         task = {
-            'n_ways': 1,  # For EndoVis can be 1,2,3 with corresponding task (binary, parts and instruments)
+            'n_ways': 1,  # For EndoVis should be 1,2,3 with corresponding task [binary, parts, instruments]
             'n_shots': 1,
             'n_queries': 1,
         }
@@ -80,11 +88,11 @@ def cfg():
     exp_str = '_'.join(
         [dataset, ]
         + [key for key, value in model.items() if value]
-        + [f'sets_{label_sets}', f'{task["n_ways"]}way_{task["n_shots"]}shot_[{mode}_{problem_type}]']
+        + [f'sets_{label_sets}', f'{task["n_ways"]}way_{task["n_shots"]}shot_[{mode}]']
     )
     path = {
         'log_dir': './runs',
-        'init_path': './pretrained_model/xxx.pth',
+        'init_path': './pretrained_model/vgg16-397923af.pth',
         'EndoVis': {'data_dir': './data/EndoVis',
                     'data_split': 'train'},
         # 'ROBUST': {}

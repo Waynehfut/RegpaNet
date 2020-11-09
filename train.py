@@ -1,12 +1,20 @@
 import os
 import shutil
 from config import ex
-from dataloader.endovis import endovis_simple_loader, endovis_few_shot_loader, get_split
+
+import torch
+import torch.nn as nn
+from torch.optim.lr_scheduler import MultiStepLR
+
+from models.fewshot import FewShotSeg
+from dataloader.endovis import get_split, endo_fewshot_loader
+from dataloader.transfomer import train_transform, val_transform
 
 
 @ex.automain
 def main(_run, _config, _log):
     # Save current code snapshot
+    _log.info('### Save code snapshot ###')
     if _run.observers:
         os.makedirs(f'{_run.observers[0].dir}/snapshots', exist_ok=True)  # save snapshots
         for source_file, _ in _run.experiment_info['sources']:
@@ -16,15 +24,38 @@ def main(_run, _config, _log):
         shutil.rmtree(f'{_run.observers[0].basedir}/_sources')
     _log.info(f'Code saved at {_run.observers[0].dir}/source/')
 
+    # build few shot model
+    _log.info('### Build model ###')
+    model = FewShotSeg(pretrained_path=_config['path']['init_path'], cfg=_config['model'])
+    model = nn.DataParallel(model.cuda(), device_ids=[_config['gpu_id'], ])
+    model.train()
+    dataname = _config['dataset']
     # load EndoVis dataset
-    if _config['dataset'] == 'EndoVis':
+    if dataname == 'EndoVis':
         train_file_names, val_file_names = get_split(_config['split'], _config['path']['EndoVis']['data_dir'])
-        _log.info(f'load {_config["dataset"]} '
-                  f'with {len(train_file_names)} train sample '
-                  f'and {len(val_file_names)} val sample')
-        few_shot_loader = endovis_few_shot_loader(train_file_names, val_file_names,
-                                                  _config['problem_type'],
-                                                  _config['task']['n_ways'],
-                                                  _config['task']['n_shots'],
-                                                  _config['task']['n_queries'],
-                                                  _config['batch_size'])
+        train_transfer = train_transform(_config, 1)
+        problem_types = ['binary', 'parts', 'instruments']
+        few_shot_loader = endo_fewshot_loader(file_names=train_file_names,
+                                              shuffle=True,
+                                              transform=train_transfer,
+                                              problem_types=problem_types,
+                                              n_ways=_config['task']['n_ways'],
+                                              n_shots=_config['task']['n_shots'],
+                                              n_queries=_config['task']['n_queries'],
+                                              batch_size=2,
+                                              num_workers=1)
+    # load ROBUST dataset
+    elif dataname == 'ROBUST':
+        few_shot_loader = None
+    else:
+        raise ValueError('Cannot find the dataset definition')
+    # set optimizer
+    _log.info('### Set optimizer ###')
+    optima = torch.optim.SGD(model.parameters(), **_config['optima'])
+    scheudler = MultiStepLR(optima, milestones=_config['lr_milestones'], gamma=0.1)
+    criterion = nn.CrossEntropyLoss(ignore_index=_config['ignore_label'])
+
+    _log.info('### Start training ###')
+    i_iter = 0
+    log_loss = {'loss': 0, 'align_loss': 0}
+

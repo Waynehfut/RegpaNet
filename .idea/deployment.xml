@@ -5,7 +5,7 @@
       <paths name="amax@114.213.234.246:22">
         <serverdata>
           <mappings>
-            <mapping deploy="/home/amax/lab_data/HAO/code/RegbaNet" local="$PROJECT_DIR$" web="/" />
+            <mapping deploy="/code/RegbaNet" local="$PROJECT_DIR$" web="/" />
           </mappings>
           <excludedPaths>
             <excludedPath path="/home/amax/lab_data/HAO/code/RegbaNet/data" />
