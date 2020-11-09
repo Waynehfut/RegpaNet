@@ -35,7 +35,7 @@ def cfg():
     problem_type = 'binary'  # or 'parts', 'instruments'
     split = 0  # or 1,2,3
     cuda_visible = '0'
-    gpu_id = 5  #
+    gpu_id = 0 #
     if mode == 'train':
         dataset = 'EndoVis'  # or 'ROBUST'
         n_steps = 30000
