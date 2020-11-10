@@ -34,8 +34,8 @@ def cfg():
     mode = 'train'  # or 'test'
     problem_type = 'binary'  # or 'parts', 'instruments'
     split = 0  # or 1,2,3
-    cuda_visible = '0'
-    gpu_id = 0 #
+    # cuda_visible = '0'
+    # gpu_id = 0, 1, 2, 3, 4, 5  #
     if mode == 'train':
         dataset = 'EndoVis'  # or 'ROBUST'
         n_steps = 30000
@@ -54,7 +54,7 @@ def cfg():
             'align': True
         }
         task = {
-            'n_ways': 1,  # For EndoVis should be 1,2,3 with corresponding task [binary, parts, instruments]
+            'n_ways': 1,  # should be one
             'n_shots': 1,
             'n_queries': 1,
         }

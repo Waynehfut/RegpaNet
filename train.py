@@ -30,7 +30,8 @@ def main(_run, _config, _log):
     # build few shot model
     _log.info('### Build model ###')
     model = FewShotSeg(pretrained_path=_config['path']['init_path'], cfg=_config['model'])
-    model = nn.DataParallel(model.cuda(), device_ids=[_config['gpu_id'], ])
+    # model = nn.DataParallel(model.cuda())
+    model = model.cuda()
     model.train()
     dataname = _config['dataset']
     # load EndoVis dataset
@@ -45,7 +46,7 @@ def main(_run, _config, _log):
                                               n_ways=_config['task']['n_ways'],
                                               n_shots=_config['task']['n_shots'],
                                               n_queries=_config['task']['n_queries'],
-                                              batch_size=2,
+                                              batch_size=_config['batch_size'],
                                               num_workers=1)
     # load ROBUST dataset
     elif dataname == 'ROBUST':
@@ -62,19 +63,18 @@ def main(_run, _config, _log):
     i_iter = 0
     log_loss = {'loss': 0, 'align_loss': 0}
     for i_iter, sampled_batch in enumerate(few_shot_loader):
-        if dataname == 'EndoVis':
-            support_datas = sampled_batch['support']
-            support_imgs = [[img.cuda() for img in way['image']] for way in support_datas]
-            support_binary_masks = [[img.cuda() for img in way['binary']] for way in support_datas]
-            support_parts_masks = [[img.cuda() for img in way['parts']] for way in support_datas]
-            support_instruments_masks = [[img.cuda() for img in way['instruments']] for way in support_datas]
-            query_datas = sampled_batch['query']
-            query_imgs = [[img.cuda() for img in way['image']] for way in query_datas]
-            query_binary_masks = [[img.cuda() for img in way['binary']] for way in query_datas]
-            query_parts_masks = [[img.cuda() for img in way['parts']] for way in query_datas]
-            query_instruments_masks = [[img.cuda() for img in way['instruments']] for way in query_datas]
-        else:
-            pass
+        support_imgs = [[img.cuda() for img in way] for way in sampled_batch['support_images']]
+        support_binary_masks = [[img.float().cuda() for img in way] for way in sampled_batch['support_binary']]
+        support_parts_masks = [[img.float().cuda() for img in way] for way in sampled_batch['support_parts']]
+        support_instruments_masks = [[img.float().cuda() for img in way] for way in
+                                     sampled_batch['support_instruments']]
+        query_imgs = [[img.cuda() for img in way] for way in sampled_batch['query_images']]
+        query_binary_masks = torch.cat([way.float().cuda() for way in sampled_batch['query_binary']],
+                                       dim=0)
+        query_parts_masks = torch.cat([way.float().cuda() for way in sampled_batch['query_parts']],
+                                       dim=0)
+        query_instruments_masks = torch.cat([way.float().cuda() for way in sampled_batch['query_instruments']],
+                                       dim=0)
         optima.zero_grad()
         query_pred, align_loss = model(support_imgs, support_binary_masks, query_imgs)
         query_loss = criterion(query_pred, query_binary_masks)

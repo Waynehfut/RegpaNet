@@ -51,7 +51,7 @@ class FewShotSeg(nn.Module):
 
         ###### Extract features ######
         imgs_concat = torch.cat([torch.cat(way, dim=0) for way in supp_imgs]
-                                + [torch.cat(qry_imgs, dim=0), ], dim=0)
+                                + [torch.cat(qry_img, dim=0) for qry_img in qry_imgs], dim=0)
         img_fts = self.encoder(imgs_concat)
         fts_size = img_fts.shape[-2:]
 
@@ -72,10 +72,10 @@ class FewShotSeg(nn.Module):
                             for shot in range(n_shots)] for way in range(n_ways)]
 
             ###### Obtain the prototypes######
-            fg_prototypes, bg_prototype = self.getPrototype(supp_fg_fts)
+            fg_prototypes = self.getPrototype(supp_fg_fts)
 
             ###### Compute the distance ######
-            prototypes = [bg_prototype, ] + fg_prototypes
+            prototypes = fg_prototypes
             dist = [self.calDist(qry_fts[:, epi], prototype) for prototype in prototypes]
             pred = torch.stack(dist, dim=1)  # N x (1 + Wa) x H' x W'
             outputs.append(F.interpolate(pred, size=img_size, mode='bilinear'))

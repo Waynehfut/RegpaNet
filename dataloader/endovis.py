@@ -53,9 +53,9 @@ class EndoVisDataset(Dataset):
         image, binary_mask, parts_mask, instruments_mask = augmented["image"], augmented[binary_mask_name], augmented[
             parts_mask_name], augmented[instruments_mask_name]
 
-        sample = {'image': img_to_tensor(image)}
+        sample = {'image': img_to_tensor(image).expand([1, -1, -1, -1])}
         if self.mode == 'train':
-            sample[binary_mask_name] = torch.from_numpy(np.expand_dims(binary_mask, 0)).float()
+            sample[binary_mask_name] = torch.from_numpy(binary_mask).float()
             sample[parts_mask_name] = torch.from_numpy(parts_mask).long()
             sample[instruments_mask_name] = torch.from_numpy(instruments_mask).long()
 

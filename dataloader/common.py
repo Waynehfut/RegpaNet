@@ -35,12 +35,32 @@ class CommFewShotDataset(Dataset):
 
     def __getitem__(self, idx):
         step = self.n_shots + self.n_queries
-        support_set = []
-        query_set = []
+        support_images = []
+        support_binary = []
+        support_parts = []
+        support_instruments = []
+        query_images = []
+        query_binary = []
+        query_parts = []
+        query_instruments = []
         for i in range(idx * step, idx * step + self.n_shots):
-            support_set.append(self.datasets[i])
+            support_images.append(self.datasets[i]['image'])
+            support_binary.append(self.datasets[i]['binary'])
+            support_parts.append(self.datasets[i]['parts'])
+            support_instruments.append(self.datasets[i]['instruments'])
         for j in range(idx * step + self.n_shots, (idx + 1) * step):
-            query_set.append(self.datasets[j])
-        sample = {'support': support_set,
-                  'query': query_set}
+            query_images.append(self.datasets[j]['image'])
+            query_binary.append(self.datasets[j]['binary'])
+            query_parts.append(self.datasets[j]['parts'])
+            query_instruments.append(self.datasets[j]['instruments'])
+        sample = {
+            'support_images': support_images,
+            'support_binary': support_binary,
+            'support_parts': support_parts,
+            'support_instruments': support_instruments,
+            'query_images': query_images,
+            'query_binary': query_binary,
+            'query_parts': query_parts,
+            'query_instruments': query_instruments
+        }
         return sample
